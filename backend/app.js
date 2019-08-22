@@ -9,6 +9,10 @@ var usersRouter = require('./routes/users');
 var moviesRouter = require('./routes/movies');
 var dataRouter = require('./routes/data');
 
+/*mysql db connect*/
+var mysqlDB = require('./db-connect');
+mysqlDB.connect();
+
 var app = express();
 
 // view engine setup

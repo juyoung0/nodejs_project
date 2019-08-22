@@ -75,8 +75,6 @@
                 <b-button :pressed="!showSF" variant="outline-warning" v-on:click="center = NYcenter; showSF=false; zoom=10">NY</b-button>
               </b-button-group>
             </b-col>
-          </b-row>
-          <b-row class="bv-row">
             <b-col class="my-selector">
               <b-button-group>
                 <b-button :pressed="showStore&&!showCustomer" variant="outline-danger" v-on:click="showStore = true; showCustomer = false">Store</b-button>
