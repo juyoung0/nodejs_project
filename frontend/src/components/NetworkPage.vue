@@ -20,8 +20,9 @@
     <div class="vertical-nav bg-white" id="sidebar" style="right:0">
       <div class="py-4 px-3 mb-4 bg-light">
         <div class="media-body">
-          <h4 class="m-0">Friend Network</h4>
+          <h4 class="m-0">Referral Network</h4>
           <p class="font-weight-light text-muted mb-0">Based on referral code</p>
+          <p class="font-weight-light text-muted mb-0">(Facebook friend is excluded)</p>
         </div>
       </div>
       <ul class="nav flex-column bg-white mb-0">
@@ -42,16 +43,20 @@
         </li>
         <li class="nav-item">
           <p class="text-gray font-weight-bold text-uppercase px-3 small pb-4 mb-0">Summary</p>
-          Max depth : {{ metaData.maxDepth }} <br>
-          Total user : {{ metaData.totalUser }} <br>
-          추천 한 사람 : {{ metaData.referrer }} <br>
-          추천 받은 사람 : {{ metaData.referree }} <br>
-          Referral User : {{ metaData.referral }} <br>
-          <br>
+          <div id="summary-wrap">
+            Max depth : {{ metaData.maxDepth }} <br>
+            Total user : {{ metaData.totalUser }} <br>
+            Referral user : {{ metaData.referral }} <br>
+            Referrer user : {{ metaData.referrer }} <br>
+            Referee user : {{ metaData.referree }} <br>
+            <br>
+          </div>
         </li>
         <li class="nav-item">
-          <p class="text-gray font-weight-bold text-uppercase px-3 small pb-4 mb-0">Information</p>
-          <div id="tooltip-wrap"></div>
+          <p class="text-gray font-weight-bold text-uppercase px-3 small pb-4 mb-0">User Information</p>
+          <div id="tooltip-wrap">
+            <b>Name</b><br><b>Referral</b><br><b>Depth</b><br><b>E-mail</b><br><b>Sign up</b>
+          </div>
         </li>
       </ul>
     </div>
@@ -117,6 +122,11 @@
   #content.active {
     width: 100%;
     margin: 0;
+  }
+
+  #summary-wrap {
+    text-align: left;
+    margin-left: 30px;
   }
 </style>
 <script>
@@ -224,12 +234,15 @@ export default {
           that.tooltip.transition()
             .duration(100)
             .style('opacity', 0.9)
+            // Use D3 to select element, change color and size
+          d3.select(this).style('stroke', 'black')
 
           that.tooltip.html('<b>Name</b> : ' + d.name + '<br><b>Referral</b> : ' + d.refere_num + '<br><b>Depth</b> : ' + d.depth + '<br><b>E-mail</b> : ' + that.userData[d.id].email + '<br><b>Sign up</b> : ' + that.userData[d.id].signUp)
         })
 
-        node.append('title')
-          .text(function (d) { return d.id })
+        circles.on('mouseout', function (d) {
+          d3.select(this).style('stroke', 'white')
+        })
 
         return node
       }
