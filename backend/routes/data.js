@@ -339,7 +339,7 @@ router.get('/network', function (req, res, next) {
     tempData = new Date();
     var init = true;
 
-    mysqlDB.query('select * from T_SOCIAL', function (err, rows, fields) {
+    mysqlDB.query('SELECT * FROM T_SOCIAL as r INNER JOIN T_ACCOUNT_INFO as a ON (r.UID = a.UID) WHERE a.UID NOT IN (SELECT UID FROM T_EXCLUDED_MEMBER)', function (err, rows, fields) {
         if (!err) {
             console.log(fields);
 
@@ -376,35 +376,32 @@ router.get('/network', function (req, res, next) {
     });
 }, function (req, res, next) {
     var maxDepth = 0;
-    mysqlDB.query('select * from T_FRIENDS', function (err, rows, fields) {
+    mysqlDB.query('SELECT * FROM T_REWARD_REFERRAL_HISTORY as r INNER JOIN T_ACCOUNT_INFO as a ON (r.REFEREE_UID = a.UID) WHERE a.UID NOT IN (SELECT UID FROM T_EXCLUDED_MEMBER)', function (err, rows, fields) {
         if (!err) {
             console.log(fields);
 
             rows.map(function(row) {
-                if (row.REASON == 'referer') {
+                userData[row.REFEREE_UID]["parentInfo"] = row.REFERRER_UID;
 
-                    userData[row.FRIEND_UID]["parentInfo"] = row.UID;
+                if (!(row.REFERRER_UID in friendList)) {
+                    friendList[row.REFERRER_UID] = [];
+                }
 
-                    if (!(row.UID in friendList)) {
-                        friendList[row.UID] = [];
-                    }
+                friendList[row.REFERRER_UID].push({'friendID': row.REFEREE_UID});
+                userData[row.REFERRER_UID]["refereNum"] ++;
 
-                    friendList[row.UID].push({'friendID': row.FRIEND_UID, 'type': row.SOCIAL_TYPE});
-                    userData[row.UID]["refereNum"] ++;
+                if (userData[row.REFERRER_UID]["registerRoute"]!=3) {
+                    if (userData[row.REFERRER_UID]["registerRoute"] == 2)
+                        userData[row.REFERRER_UID]["registerRoute"] = 3;
+                    else
+                        userData[row.REFERRER_UID]["registerRoute"] = 1;
+                }
 
-                    if (userData[row.UID]["registerRoute"]!=3) {
-                        if (userData[row.UID]["registerRoute"] == 2)
-                            userData[row.UID]["registerRoute"] = 3;
-                        else
-                            userData[row.UID]["registerRoute"] = 1;
-                    }
-
-                    if (userData[row.FRIEND_UID]["registerRoute"]!=3) {
-                        if (userData[row.FRIEND_UID]["registerRoute"]==1)
-                            userData[row.FRIEND_UID]["registerRoute"] = 3;
-                        else
-                            userData[row.FRIEND_UID]["registerRoute"] = 2;
-                    }
+                if (userData[row.REFEREE_UID]["registerRoute"]!=3) {
+                    if (userData[row.REFEREE_UID]["registerRoute"]==1)
+                        userData[row.REFEREE_UID]["registerRoute"] = 3;
+                    else
+                        userData[row.REFEREE_UID]["registerRoute"] = 2;
                 }
             })
         } else {
