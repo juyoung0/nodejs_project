@@ -2,10 +2,10 @@
   <div id="app">
     <b-navbar toggleable="lg" type="dark" variant="info">
       <router-link to="/">
-        <b-navbar-brand href="">ASKHUB Vis</b-navbar-brand>
+        <b-navbar-brand href="">ASKHUB Visualization</b-navbar-brand>
       </router-link>
         <b-navbar-nav>
-          <router-link tag="li" class="nav-link" to="network">Refere Network</router-link>
+          <router-link tag="li" class="nav-link" to="network">Referral Network</router-link>
           <router-link tag="li" class="nav-link" to="ordermap" active>Order Map</router-link>
         </b-navbar-nav>
     </b-navbar>

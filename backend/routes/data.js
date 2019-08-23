@@ -459,7 +459,6 @@ router.get('/network', function (req, res, next) {
                     networkData["link"].push({"source": key, "target": myFriend.friendID, "value": myFriend.type});
             })
         })
-        console.log('CSV file successfully processed');
 
         metaData = {"maxDepth": maxDepth, "totalUser": totalUser, "referral": referral, "referrer": referrer, "referree": referree, "startDate": startDate, "endDate": endDate};
         result["metaData"] = metaData;

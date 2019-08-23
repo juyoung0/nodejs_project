@@ -56,14 +56,16 @@
       <ul class="nav flex-column bg-white mb-0">
         <li class="nav-item">
           <b-row class="bv-row">
-            <b-col cols="4">
-              <datepicker :value="startDate" name="startDate" @selected="changeStartDate" :format="customFormatter"></datepicker>
+            <b-col class="datepicker-wrapper">
+              <b-row>
+                <datepicker style="width:50px;" :value="startDate" name="startDate" @selected="changeStartDate" :format="customFormatter"></datepicker>
+              </b-row>
+              <b-row>
+                <datepicker style="width:50px;" :value="endDate" name="endDate" @selected="changeEndDate" :format="customFormatter"></datepicker>
+              </b-row>
             </b-col>
-            <b-col cols="4">
-              <datepicker :value="endDate" name="endDate" @selected="changeEndDate" :format="customFormatter"></datepicker>
-            </b-col>
-            <b-col cols="4" class="my-selector">
-              <b-button variant="primary"  v-on:click="changeDate">Update</b-button>
+            <b-col class="btn-wrapper">
+              <b-button variant="primary" v-on:click="changeDate">Update</b-button>
             </b-col>
           </b-row>
         </li>
@@ -71,25 +73,28 @@
           <b-row class="bv-row">
             <b-col class="my-selector">
               <b-button-group>
-                <b-button :pressed="showSF" variant="outline-warning" v-on:click="center = SFcenter; showSF=true; zoom=10">SF</b-button>
-                <b-button :pressed="!showSF" variant="outline-warning" v-on:click="center = NYcenter; showSF=false; zoom=10">NY</b-button>
+                <b-button :pressed="showSF" variant="outline-dark" v-on:click="center = SFcenter; showSF=true; zoom=10">SF</b-button>
+                <b-button :pressed="!showSF" variant="outline-dark" v-on:click="center = NYcenter; showSF=false; zoom=10">NY</b-button>
               </b-button-group>
             </b-col>
+          </b-row>
+          <b-row class="bv-row">
             <b-col class="my-selector">
               <b-button-group>
-                <b-button :pressed="showStore&&!showCustomer" variant="outline-danger" v-on:click="showStore = true; showCustomer = false">Store</b-button>
-                <b-button :pressed="!showStore&&showCustomer" variant="outline-info" v-on:click="showStore = false; showCustomer = true">Customer</b-button>
+                <b-button :pressed="showStore&&!showCustomer" variant="outline-dark" v-on:click="showStore = true; showCustomer = false">Provider</b-button>
+                <b-button :pressed="!showStore&&showCustomer" variant="outline-dark" v-on:click="showStore = false; showCustomer = true">User</b-button>
                 <!--<b-button :pressed="showStore&&showCustomer" variant="outline-success" v-on:click="showStore = true; showCustomer = true">Both</b-button>-->
               </b-button-group>
             </b-col>
           </b-row>
         </li>
         <li class="nav-item">
+          <hr class="style1">
           <b-row class="bv-row">
             <b-col class="my-selector">
               <b-button-group>
-                <b-button :pressed="showStoreTable" variant="outline-dark" v-on:click="showStoreTable = true;">Store Table</b-button>
-                <b-button :pressed="!showStoreTable" variant="outline-dark" v-on:click="showStoreTable = false;">Customer Table</b-button>
+                <b-button :pressed="showStoreTable" variant="outline-dark" v-on:click="showStoreTable = true;">Provider Table</b-button>
+                <b-button :pressed="!showStoreTable" variant="outline-dark" v-on:click="showStoreTable = false;">User Table</b-button>
               </b-button-group>
               <b-button v-on:click="showAll">초기화</b-button>
             </b-col>
@@ -500,11 +505,25 @@ $(function () {
   }
 
   .vdp-datepicker input{
-    width: 75px;
+    width: 50px;
     height: 20px;
   }
 
   .my-selector {
     margin-bottom: 5px;
+    text-align: left;
+    margin-left: 10px;
+  }
+
+  hr.style1{
+    border-top: 1px solid #8c8b8b;
+  }
+  .datepicker-wrapper {
+    margin-left: 25px;
+    margin-bottom: 5px;
+  }
+  .btn-wrapper {
+    margin-top: 10px;
+    text-align: left;
   }
 </style>
