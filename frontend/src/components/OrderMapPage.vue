@@ -20,7 +20,6 @@
             <I-tooltip>
               <b>Name</b> : {{ point.name }}<br>
               <b>Service</b> : {{ point.service }}<br>
-              <b>Distance</b> : {{ point.dist }} m<br>
               <b>Amount</b> : {{ point.amount/100 }} $<br>
               <b>Order Time</b> : {{ point.time }} <br>
               <b>Order ID</b> : {{ point.orderID }} <br>
@@ -158,7 +157,7 @@ export default {
   name: 'OrderMapPage',
   created: function () {
     this.latlngPoint = {'customer': [], 'store': []}
-    this.$http.get('/api/data/order')
+    this.$http.get('/api/data/order_csv')
       .then((response) => {
         this.orderData = response.data.orderData
         this.storeData = response.data.uniqueStore
@@ -297,12 +296,12 @@ export default {
 
       if (that.orderData) {
         Object.keys(this.orderData).map(function (key, idx) {
-          that.latlngPoint['customer'].push({'uid': that.orderData[key].userID, 'latlng': [that.orderData[key].customerLat, that.orderData[key].customerLng], 'storeLatlng': [that.orderData[key].storeLat, that.orderData[key].storeLng], 'orderID': key, 'name': that.orderData[key].name, 'service': that.orderData[key].service, 'time': that.orderData[key].time, 'amount': that.orderData[key].amount, 'dist': that.orderData[key].dist.toFixed(2), 'avgDist': that.orderData[key].avgDist, 'avgAmount': that.orderData[key].avgAmount, 'visible': true})
+          that.latlngPoint['customer'].push({'uid': that.orderData[key].userID, 'latlng': [that.orderData[key].customerLat, that.orderData[key].customerLng], 'storeLatlng': [that.orderData[key].storeLat, that.orderData[key].storeLng], 'orderID': key, 'name': that.orderData[key].name, 'service': that.orderData[key].service, 'time': that.orderData[key].time, 'amount': that.orderData[key].amount, 'avgAmount': that.orderData[key].avgAmount, 'visible': true})
         })
       }
       if (that.storeData) {
         this.storeData.map(function (store) {
-          that.latlngPoint['store'].push({'uid': store.uid, 'latlng': store.latlng, 'service': store.service, 'count': store.count, 'avgDist': store.avgDist, 'avgAmount': store.avgAmount, 'visible': true})
+          that.latlngPoint['store'].push({'uid': store.uid, 'latlng': store.latlng, 'service': store.service, 'count': store.count, 'avgAmount': store.avgAmount, 'visible': true})
         })
       }
       return true
