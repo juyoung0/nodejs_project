@@ -137,7 +137,7 @@ var moment = require('moment-timezone')
 export default {
   name: 'Network',
   created: function () {
-    this.$http.get('/api/data/network')
+    this.$http.get('/api/data/network_csv')
       .then((response) => {
         this.networkData = response.data.networkData
         this.userData = response.data.userData

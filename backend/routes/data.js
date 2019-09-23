@@ -136,7 +136,7 @@ router.get('/network_csv', function (req, res, next) {
         });
 });
 
-router.get('/order', function (req, res, next) {
+router.get('/order_csv', function (req, res, next) {
     orderData = {};
     result = {};
     storeList = {};
@@ -147,7 +147,7 @@ router.get('/order', function (req, res, next) {
     endDate = new Date();
     var init = true;
     tempData = new Date();
-    fs.createReadStream('data/order_dist_0530_0731.csv')
+    fs.createReadStream('data/order_dist_0530_0821.csv')
         .pipe(parse())
         .on('data', (row) => {
             if(row.ORDER_ID != null) {
@@ -159,7 +159,7 @@ router.get('/order', function (req, res, next) {
                 orderData[row.ORDER_ID]['address'] = row.ADDRESS;
                 orderData[row.ORDER_ID]['customerLat'] = Number(row.CUSTOMER_ADDRESS_LAT);
                 orderData[row.ORDER_ID]['customerLng'] = Number(row.CUSTOMER_ADDRESS_LNG);
-                orderData[row.ORDER_ID]['dist'] = Number(row.DISTANCE);
+                // orderData[row.ORDER_ID]['dist'] = Number(row.DISTANCE);
 
                 var dateParse = moment(row.CREATED_AT, "YYYY.MM.DD HH:mm");
                 tempDate = dateParse.toDate();
@@ -187,7 +187,7 @@ router.get('/order', function (req, res, next) {
                 if ([orderData[row.ORDER_ID]['storeLat'], orderData[row.ORDER_ID]['storeLng']].toString() in storeList) {
                     storeList[[orderData[row.ORDER_ID]['storeLat'], orderData[row.ORDER_ID]['storeLng']].toString()]["count"]++;
                     storeList[[orderData[row.ORDER_ID]['storeLat'], orderData[row.ORDER_ID]['storeLng']].toString()]["uid"].push(row.UID);
-                    storeList[[orderData[row.ORDER_ID]['storeLat'], orderData[row.ORDER_ID]['storeLng']].toString()]["avgDist"] += Number(row.DISTANCE);
+                    // storeList[[orderData[row.ORDER_ID]['storeLat'], orderData[row.ORDER_ID]['storeLng']].toString()]["avgDist"] += Number(row.DISTANCE);
                     storeList[[orderData[row.ORDER_ID]['storeLat'], orderData[row.ORDER_ID]['storeLng']].toString()]["avgAmount"] += Number(row.AMOUNT);
                 }else {
                     storeList[[orderData[row.ORDER_ID]['storeLat'], orderData[row.ORDER_ID]['storeLng']].toString()] = {"uid":[row.UID], "latlng":[orderData[row.ORDER_ID]['storeLat'], orderData[row.ORDER_ID]['storeLng']], "service":row.SERVICE_PROVIDER, "count":1, "avgDist":Number(row.DISTANCE), "avgAmount":Number(row.AMOUNT)}
@@ -242,20 +242,20 @@ router.get('/order_mysql', function (req, res, next) {
     tempData = new Date();
 
 
-    mysqlDB.query('select * from T_SOCIAL', function (err, rows, fields) {
+    mysqlDB.query('SELECT u.UID, u.NAME, u.SERVICE_PROVIDER_ID, u.AMOUNT, u.ORDER_DATE, u.ADDRESS as u_addr, u.USER_LATITUDE AS u_lat, u.USER_LONGITUDE AS u_lng, u.RESTAURANT_ADDRESS AS r_addr, u.RESTAURANT_LATITUDE AS r_lat, u.RESTAURANT_LONGITUDE AS r_lng FROM T_USERS_ORDER_INFO as u WHERE u.UID NOT IN (SELECT UID FROM T_EXCLUDED_MEMBER)', function (err, rows, fields) {
         if (!err) {
             console.log(fields);
 
             if(row.ORDER_ID != null) {
                 orderData[row.ORDER_ID] = {};
                 orderData[row.ORDER_ID]['userID'] = row.UID;
-                orderData[row.ORDER_ID]['name'] = row.DISPLAY_NAME;
+                orderData[row.ORDER_ID]['name'] = row.NAME;
                 orderData[row.ORDER_ID]['amount'] = Number(row.AMOUNT);
-                orderData[row.ORDER_ID]['service'] = row.SERVICE_PROVIDER;
-                orderData[row.ORDER_ID]['address'] = row.ADDRESS;
-                orderData[row.ORDER_ID]['customerLat'] = Number(row.CUSTOMER_ADDRESS_LAT);
-                orderData[row.ORDER_ID]['customerLng'] = Number(row.CUSTOMER_ADDRESS_LNG);
-                orderData[row.ORDER_ID]['dist'] = Number(row.DISTANCE);
+                orderData[row.ORDER_ID]['service'] = row.p.service_provider_id;
+                orderData[row.ORDER_ID]['address'] = row.r_addr;
+                orderData[row.ORDER_ID]['customerLat'] = Number(row.u_lat);
+                orderData[row.ORDER_ID]['customerLng'] = Number(row.u_lng);
+                // orderData[row.ORDER_ID]['dist'] = Number(row.DISTANCE);
 
                 var dateParse = moment(row.CREATED_AT, "YYYY.MM.DD HH:mm");
                 tempDate = dateParse.toDate();
@@ -272,29 +272,28 @@ router.get('/order_mysql', function (req, res, next) {
                         endDate = tempDate
                 }
 
-                if (row.RESTAURANT_ADDRESS_LAT != '-' && row.RESTAURANT_ADDRESS_LNG != '-') {
-                    orderData[row.ORDER_ID]['storeLat'] = Number(row.RESTAURANT_ADDRESS_LAT);
-                    orderData[row.ORDER_ID]['storeLng'] = Number(row.RESTAURANT_ADDRESS_LNG);
+                if (r_lat != '-' && r_lng != '-') {
+                    orderData[row.ORDER_ID]['storeLat'] = Number(r_lat);
+                    orderData[row.ORDER_ID]['storeLng'] = Number(r_lng);
                 }else{
-                    orderData[row.ORDER_ID]['storeLat'] = Number(row.CUSTOMER_ADDRESS_LAT);
-                    orderData[row.ORDER_ID]['storeLng'] = Number(row.CUSTOMER_ADDRESS_LNG);
+                    orderData[row.ORDER_ID]['storeLat'] = Number(row.u_lat);
+                    orderData[row.ORDER_ID]['storeLng'] = Number(row.u_lng);
                 }
 
                 if ([orderData[row.ORDER_ID]['storeLat'], orderData[row.ORDER_ID]['storeLng']].toString() in storeList) {
                     storeList[[orderData[row.ORDER_ID]['storeLat'], orderData[row.ORDER_ID]['storeLng']].toString()]["count"]++;
                     storeList[[orderData[row.ORDER_ID]['storeLat'], orderData[row.ORDER_ID]['storeLng']].toString()]["uid"].push(row.UID);
-                    storeList[[orderData[row.ORDER_ID]['storeLat'], orderData[row.ORDER_ID]['storeLng']].toString()]["avgDist"] += Number(row.DISTANCE);
+                    // storeList[[orderData[row.ORDER_ID]['storeLat'], orderData[row.ORDER_ID]['storeLng']].toString()]["avgDist"] += Number(row.DISTANCE);
                     storeList[[orderData[row.ORDER_ID]['storeLat'], orderData[row.ORDER_ID]['storeLng']].toString()]["avgAmount"] += Number(row.AMOUNT);
                 }else {
-                    storeList[[orderData[row.ORDER_ID]['storeLat'], orderData[row.ORDER_ID]['storeLng']].toString()] = {"uid":[row.UID], "latlng":[orderData[row.ORDER_ID]['storeLat'], orderData[row.ORDER_ID]['storeLng']], "service":row.SERVICE_PROVIDER, "count":1, "avgDist":Number(row.DISTANCE), "avgAmount":Number(row.AMOUNT)}
+                    storeList[[orderData[row.ORDER_ID]['storeLat'], orderData[row.ORDER_ID]['storeLng']].toString()] = {"uid":[row.UID], "latlng":[orderData[row.ORDER_ID]['storeLat'], orderData[row.ORDER_ID]['storeLng']], "service":row.SERVICE_PROVIDER_id, "count":1,  "avgAmount":Number(row.AMOUNT)}
                 }
 
                 if (row.UID in customerList) {
                     customerList[row.UID]["count"]++;
-                    customerList[row.UID]["avgDist"] += Number(row.DISTANCE);
                     customerList[row.UID]["avgAmount"] += Number(row.AMOUNT);
                 }else {
-                    customerList[row.UID] = {"uid": row.UID, "name": row.DISPLAY_NAME, "count":1, "latlng":[row.CUSTOMER_ADDRESS_LAT, row.CUSTOMER_ADDRESS_LNG], "avgDist":Number(row.DISTANCE), "avgAmount":Number(row.AMOUNT)};
+                    customerList[row.UID] = {"uid": row.UID, "name": row.DISPLAY_NAME, "count":1, "latlng":[row.u_lat, row.u_lng],  "avgAmount":Number(row.AMOUNT)};
                 }
             }
         } else {
@@ -328,7 +327,7 @@ router.get('/order_mysql', function (req, res, next) {
     });
 })
 
-router.get('/network', function (req, res, next) {
+router.get('/network_mysql', function (req, res, next) {
     userData = {};
     friendList = {};
     networkData = {"node": [], "link": []};
